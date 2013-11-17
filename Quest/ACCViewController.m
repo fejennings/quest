@@ -7,7 +7,7 @@
 //
 
 #import "ACCViewController.h"
-#import "ACCMyScene.h"
+#import "ACCLevel.h"
 
 @implementation ACCViewController
 
@@ -21,7 +21,7 @@
     skView.showsNodeCount = YES;
     
     // Create and configure the scene.
-    SKScene * scene = [ACCMyScene sceneWithSize:skView.bounds.size];
+    SKScene * scene = [ACCLevel sceneWithSize:skView.bounds.size];
     scene.scaleMode = SKSceneScaleModeAspectFill;
     
     // Present the scene.

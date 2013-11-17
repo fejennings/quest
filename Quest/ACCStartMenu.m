@@ -1,16 +1,16 @@
 //
-//  ACCMyScene.m
+//  ACCStartMenu.m
 //  Quest
 //
 //  Created by Frank Jennings on 11/17/13.
 //  Copyright (c) 2013 Acceltius. All rights reserved.
 //
 
-#import "ACCMyScene.h"
+#import "ACCStartMenu.h"
 
-@implementation ACCMyScene
+@implementation ACCStartMenu
 
--(id)initWithSize:(CGSize)size {    
+-(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
         /* Setup your scene here */
         
@@ -18,7 +18,7 @@
         
         SKLabelNode *myLabel = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
         
-        myLabel.text = @"Hello, World!";
+        myLabel.text = @"Hello, StartMenu";
         myLabel.fontSize = 30;
         myLabel.position = CGPointMake(CGRectGetMidX(self.frame),
                                        CGRectGetMidY(self.frame));
@@ -28,23 +28,6 @@
     return self;
 }
 
--(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    /* Called when a touch begins */
-    
-    for (UITouch *touch in touches) {
-        CGPoint location = [touch locationInNode:self];
-        
-        SKSpriteNode *sprite = [SKSpriteNode spriteNodeWithImageNamed:@"Spaceship"];
-        
-        sprite.position = location;
-        
-        SKAction *action = [SKAction rotateByAngle:M_PI duration:1];
-        
-        [sprite runAction:[SKAction repeatActionForever:action]];
-        
-        [self addChild:sprite];
-    }
-}
 
 -(void)update:(CFTimeInterval)currentTime {
     /* Called before each frame is rendered */
