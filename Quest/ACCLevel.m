@@ -43,6 +43,18 @@
     return self;
 }
 
+-(void) didBeginContact:(SKPhysicsContact *)contact {
+    SKPhysicsBody *firstBody, *secondBody;
+    
+    firstBody = contact.bodyA;
+    secondBody = contact.bodyB;
+    
+    if(firstBody.categoryBitMask == wallCategory || secondBody.categoryBitMask == wallCategory) {
+        
+        NSLog(@"Someone hit the wall");
+    }
+}
+
 
 -(void) setUpCharacters {
     NSLog(@"setup characters");
@@ -50,6 +62,20 @@
     leader = [ACCCharacter node];
     [myWorld addChild:leader];
     
+    
+}
+
+-(void)didSimulatePhysics
+{
+    
+    [self centerOnNode: leader];
+}
+
+-(void) centerOnNode: (SKNode *) node
+{
+    
+    CGPoint cameraPositionInSchene = [node.scene convertPoint:node.position fromNode:node.parent];
+    node.parent.position = CGPointMake(node.parent.position.x - cameraPositionInSchene.x,node.parent.position.y - cameraPositionInSchene.y);
     
 }
 
@@ -65,11 +91,12 @@
     [myWorld addChild:map];
     
     //Setup Physics Workd
-    self.physicsWorld.gravity = CGVectorMake(0, 0);
+    self.physicsWorld.gravity = CGVectorMake(0.5, -0.9);
     self.physicsWorld.contactDelegate = self;
     
     myWorld.physicsBody = [SKPhysicsBody bodyWithEdgeLoopFromRect:map.frame];
     myWorld.physicsBody.categoryBitMask = wallCategory;
+
     
 
 
