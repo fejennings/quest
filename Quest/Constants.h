@@ -5,3 +5,5 @@ static const int left=3;
 static const int right=4;
 static const int wallCategory =4;
 static const int playerCategory = 1;
+static const int circleType = 0;
+static const int squareType = 1;

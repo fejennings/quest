@@ -11,4 +11,19 @@
 
 @interface ACCCharacter : SKNode
 
+@property (nonatomic, assign) int idealX;
+@property (nonatomic, assign) int idealY;
+@property (nonatomic, assign) BOOL theLeader;
+
+
+-(void)createWithDictionary: (NSDictionary*) charData;
+-(void)update;
+-(void)moveLeftWithPlace:(NSNumber*) place;
+-(void)moveRightWithPlace:(NSNumber*) place;
+-(void)moveUpWithPlace:(NSNumber*) place;
+-(void)moveDownWithPlace:(NSNumber*) place;
+-(void)makeLeader;
+
+
 @end
+
