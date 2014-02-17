@@ -204,11 +204,46 @@ CGFloat radiansToDegrees(CGFloat radians) {
     currentDirection=down;
 }
 
+
+#pragma mark STOP Moving
+
+-(void)stopMoving {
+    
+    currentDirection = noDirection;
+    [character removeAllActions];
+    
+}
+-(void)stopInFormation:(int)direction andPlaceInLine:(int)place leaderLocation:(CGPoint)location{
+    int paddingX = character.frame.size.width / 2;
+    int paddingY = character.frame.size.height / 2;
+    CGPoint newPosition;
+    if (direction==up ) {
+             newPosition = CGPointMake(location.x, location.y - (paddingY*place));
+    } else if (direction == down) {
+             newPosition = CGPointMake(location.x, location.y + (paddingY*place));
+    } else if (direction == right) {
+             newPosition = CGPointMake(location.x - (paddingX*place), location.y );
+    } else if (direction == left) {
+             newPosition = CGPointMake(location.x + (paddingX*place), location.y );
+    }
+    NSLog(@"Move %i to %f, %f", place, newPosition.x, newPosition.y);
+    SKAction* moveIntoLine = [SKAction moveTo:newPosition duration:0.5f];
+    SKAction* stop = [SKAction performSelector:@selector(stopMoving) onTarget:self];
+    SKAction* sequence = [SKAction sequence:@[moveIntoLine, stop]];
+    [self runAction:sequence];
+
+}
+
+
 #pragma mark Leader Stuff
 
 -(void) makeLeader {
     
     _theLeader = YES;
 }
+-(int)returnDirection {
+    return currentDirection;
+}
+
 
 @end

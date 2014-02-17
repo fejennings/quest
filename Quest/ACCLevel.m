@@ -176,7 +176,7 @@
 //                [character moveLeftWithPlace:[NSNumber numberWithInt:place]];
             }
         }
-        ++place;
+        place ++;
     }];
 }
 
@@ -195,7 +195,7 @@
 //                [character moveRightWithPlace:[NSNumber numberWithInt:place]];
             }
         }
-        ++place;
+        place ++;
     }];
 }
 
@@ -214,7 +214,7 @@
 //                [character moveUpWithPlace:[NSNumber numberWithInt:place]];
             }
         }
-        ++place;
+        place ++;
     }];
 }
 
@@ -233,7 +233,7 @@
 //                [character moveDownWithPlace:[NSNumber numberWithInt:place]];
             }
         }
-        ++place;
+        place ++;
     }];
 }
 
@@ -253,11 +253,37 @@
     
     if (recognizer.state == UIGestureRecognizerStateEnded) {
         NSLog(@"Rotation Ended");
-    }
+        [self stopAllPlayersAndPutIntoLine];    }
     
     if (recognizer.state == UIGestureRecognizerStateBegan) {
         NSLog(@"Rotation Began");
+
     }
+}
+
+#pragma  mark STOP ALL CHARACTERS
+-(void)stopAllPlayersAndPutIntoLine {
+    
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    __block unsigned char leaderDirection;
+    __block unsigned char place=0;
+    
+    [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
+        // do something if we find a character in myWorld
+        ACCCharacter* character = (ACCCharacter*)node;
+        
+            if (character==leader) {
+                
+                leaderDirection=[leader returnDirection];
+                [leader stopMoving];
+                
+            } else {
+                
+                [character stopInFormation:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
+            }
+        place ++;
+    }];
+    
 }
 
 -(void)willMoveFromView:(SKView *)view {

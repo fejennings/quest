@@ -23,6 +23,9 @@
 -(void)moveUpWithPlace:(NSNumber*) place;
 -(void)moveDownWithPlace:(NSNumber*) place;
 -(void)makeLeader;
+-(int)returnDirection;
+-(void)stopMoving;
+-(void)stopInFormation:(int)direction andPlaceInLine:(int)place leaderLocation:(CGPoint)location;
 
 
 @end

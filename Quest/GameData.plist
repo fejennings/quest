@@ -17,7 +17,7 @@
 					<key>BaseFrame</key>
 					<string>character</string>
 					<key>StartLocation</key>
-					<string>{-100,0}</string>
+					<string>{0,0}</string>
 					<key>UseForCollisions</key>
 					<true/>
 					<key>CollisionBodyType</key>
@@ -31,13 +31,13 @@
 					<key>BaseFrame</key>
 					<string>character</string>
 					<key>StartLocation</key>
-					<string>{0,0}</string>
+					<string>{-100,0}</string>
 					<key>UseForCollisions</key>
 					<true/>
 					<key>CollisionBodyType</key>
 					<string>circle</string>
 					<key>CollisionBodyCoversWhatPercent</key>
-					<integer>1</integer>
+					<real>0.9</real>
 					<key>DebugBody</key>
 					<true/>
 				</dict>
