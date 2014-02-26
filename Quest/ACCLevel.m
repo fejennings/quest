@@ -27,8 +27,12 @@
     UITapGestureRecognizer* twoFingerTap;
     UITapGestureRecognizer* threeFingerTap;
     UIRotationGestureRecognizer* rotationGR;
+    NSNumber* maxFollowers;
     
     unsigned char charactersInWorld;
+    
+    float followDelay;
+    bool useDelayedFollow;
 
 }
 
@@ -89,8 +93,10 @@
             if (character==leader) {
                 //do something later
             } else {
-                character.idealX = leader.position.x;
-                character.idealY = leader.position.y;
+                if (character.followingEnabed == YES) {
+                    character.idealX = leader.position.x;
+                    character.idealY = leader.position.y;
+                }
             }
             
             [character update];
@@ -112,6 +118,25 @@
         
         NSLog(@"Someone hit the wall");
     }
+    if(firstBody.categoryBitMask == playerCategory || secondBody.categoryBitMask == playerCategory) {
+        
+        ACCCharacter* character1 = (ACCCharacter*) firstBody.node;
+        ACCCharacter* character2 = (ACCCharacter*) secondBody.node;
+        
+        if(character1 == leader) {
+            if (character2.followingEnabed == NO) {
+                character2.followingEnabed = YES;
+                [character2 followIntoPositionWithDirection:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
+            }
+            
+        } else if (character2.followingEnabed == NO) {
+            character1.followingEnabed = YES;
+            [character1 followIntoPositionWithDirection:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
+           
+        }
+        
+    }
+    
 }
 
 
@@ -172,7 +197,7 @@
             if (character==leader) {
                 [character moveLeftWithPlace:[NSNumber numberWithInt:0]];
             } else {
-                [character performSelector:@selector(moveLeftWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(place*0.25)];
+                [character performSelector:@selector(moveLeftWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(place*followDelay)];
 //                [character moveLeftWithPlace:[NSNumber numberWithInt:place]];
             }
         }
@@ -191,7 +216,7 @@
             if (character==leader) {
                 [character moveRightWithPlace:[NSNumber numberWithInt:0]];
             } else {
-                [character performSelector:@selector(moveRightWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(place*0.25)];
+                [character performSelector:@selector(moveRightWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(place*followDelay)];
 //                [character moveRightWithPlace:[NSNumber numberWithInt:place]];
             }
         }
@@ -210,7 +235,7 @@
             if (character==leader) {
                 [character moveUpWithPlace:[NSNumber numberWithInt:0]];
             } else {
-                [character performSelector:@selector(moveUpWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(place*0.25)];
+                [character performSelector:@selector(moveUpWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(place*followDelay)];
 //                [character moveUpWithPlace:[NSNumber numberWithInt:place]];
             }
         }
@@ -229,7 +254,7 @@
             if (character==leader) {
                 [character moveDownWithPlace:[NSNumber numberWithInt:0]];
             } else {
-                [character performSelector:@selector(moveDownWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(place*0.25)];
+                [character performSelector:@selector(moveDownWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(place*followDelay)];
 //                [character moveDownWithPlace:[NSNumber numberWithInt:place]];
             }
         }
@@ -339,6 +364,12 @@
     SKSpriteNode* map = [SKSpriteNode spriteNodeWithImageNamed:[levelDict objectForKey:@"Background"]];
     map.position = CGPointMake(0, 0);
     [myWorld addChild:map];
+    
+    useDelayedFollow = [[levelDict objectForKey:@"UseDelayedFollow"]boolValue];
+    followDelay = [[levelDict objectForKey:@"FollowDelay"]floatValue];
+    if (useDelayedFollow == NO) {
+        followDelay =0.0;
+    }
     
     //Setup Physics Workd
     

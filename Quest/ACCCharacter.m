@@ -47,6 +47,7 @@
     
     [self addChild:character];
     
+    _followingEnabed = [[characterData objectForKey:@"FollowingEnabled"]  boolValue];
     useForCollisions = [[characterData objectForKey:@"UseForCollisions"]  boolValue];
     
     
@@ -66,7 +67,7 @@
 -(void) setUpPhysics {
   
     collisionBodyCoversWhatPercent  = [[characterData objectForKey:@"CollisionBodyCoversWhatPercent"] floatValue];
-    CGSize newSize = CGSizeMake( character.size.width *collisionBodyCoversWhatPercent  , character.frame.size.height * collisionBodyCoversWhatPercent);
+    CGSize newSize = CGSizeMake( character.size.width *collisionBodyCoversWhatPercent  , character.size.height * collisionBodyCoversWhatPercent);
     
     if ([[ characterData objectForKey:@"CollisionBodyType"] isEqualToString:@"square" ]) {
         collisionBodyType = squareType;
@@ -125,6 +126,7 @@
 
 -(void) update  {
     //NSLog(@"Update called on character");
+    if (_followingEnabed == YES || _theLeader == YES) {
     switch (currentDirection) {
         case up:
             self.position = CGPointMake(self.position.x,self.position.y + speed);
@@ -174,6 +176,7 @@
         default:
             break;
     }
+    } // if following enabled
     
     
 }
@@ -188,20 +191,61 @@ CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 -(void)moveLeftWithPlace:(NSNumber*) place {
-    character.zRotation = degreesToRadians(-90);
-    currentDirection=left;
+    if (_followingEnabed == YES || _theLeader == YES) {
+        character.zRotation = degreesToRadians(-90);
+        currentDirection=left;
+
+    }
 }
 -(void)moveRightWithPlace:(NSNumber*) place{
-    character.zRotation = degreesToRadians(90);
-    currentDirection=right;
+    if (_followingEnabed == YES || _theLeader == YES) {
+        character.zRotation = degreesToRadians(90);
+        currentDirection=right;
+
+    }
 }
 -(void)moveUpWithPlace:(NSNumber*) place{
-    character.zRotation = degreesToRadians(180);
-    currentDirection=up;
+    if (_followingEnabed == YES || _theLeader == YES) {
+        character.zRotation = degreesToRadians(180);
+        currentDirection=up;
+    }
 }
 -(void)moveDownWithPlace:(NSNumber*) place{
-    character.zRotation = degreesToRadians(0);
-    currentDirection=down;
+    if (_followingEnabed == YES || _theLeader == YES) {
+        character.zRotation = degreesToRadians(0);
+        currentDirection=down;
+    }
+}
+    
+
+-(void)followIntoPositionWithDirection:(int)direction andPlaceInLine:(int)place leaderLocation:(CGPoint)location {
+    // Will be used to pick up new follower
+    int paddingX = character.frame.size.width;// / 2;
+    int paddingY = character.frame.size.height;// / 2;
+    CGPoint newPosition;
+    
+    //Need to add another action if follower has to move "around" the leader
+    // indicated for up by x being equal but direction to leader is down
+    
+    
+    if (_followingEnabed == YES ) {
+        if (direction==up ) {
+            newPosition = CGPointMake(location.x, location.y - (paddingY*place));
+            [self moveUpWithPlace:[NSNumber numberWithInt:place]];
+        } else if (direction == down) {
+            newPosition = CGPointMake(location.x, location.y + (paddingY*place));
+            [self moveDownWithPlace:[NSNumber numberWithInt:place]];
+        } else if (direction == right) {
+            newPosition = CGPointMake(location.x - (paddingX*place), location.y );
+            [self moveRightWithPlace:[NSNumber numberWithInt:place]];
+        } else if (direction == left) {
+            newPosition = CGPointMake(location.x + (paddingX*place), location.y );
+            [self moveLeftWithPlace:[NSNumber numberWithInt:place]];
+        }
+        NSLog(@"Follow %i to %f, %f", place, newPosition.x, newPosition.y);
+        SKAction* moveIntoLine = [SKAction moveTo:newPosition duration:0.2f];
+        [self runAction:moveIntoLine];
+    }
 }
 
 
@@ -214,24 +258,35 @@ CGFloat radiansToDegrees(CGFloat radians) {
     
 }
 -(void)stopInFormation:(int)direction andPlaceInLine:(int)place leaderLocation:(CGPoint)location{
-    int paddingX = character.frame.size.width / 2;
-    int paddingY = character.frame.size.height / 2;
+    if (_followingEnabed == YES && currentDirection != noDirection) {
+    
+    int paddingX = character.frame.size.width;// / 2;
+    int paddingY = character.frame.size.height;// / 2;
     CGPoint newPosition;
-    if (direction==up ) {
-             newPosition = CGPointMake(location.x, location.y - (paddingY*place));
-    } else if (direction == down) {
+    
+    //Need to add another action if follower has to move "around" the leader
+    // indicated for up by x being equal but direction to leader is down
+    
+ 
+        if (direction==up ) {
+                newPosition = CGPointMake(location.x, location.y - (paddingY*place));
+        } else if (direction == down) {
              newPosition = CGPointMake(location.x, location.y + (paddingY*place));
-    } else if (direction == right) {
+        } else if (direction == right) {
              newPosition = CGPointMake(location.x - (paddingX*place), location.y );
-    } else if (direction == left) {
+        } else if (direction == left) {
              newPosition = CGPointMake(location.x + (paddingX*place), location.y );
+        } else {
+             newPosition = self.position; // not in course.  Caused second rotate to put followers on top of each other.
+        }
+        NSLog(@"Move %i to %f, %f", place, newPosition.x, newPosition.y);
+        SKAction* moveIntoLine = [SKAction moveTo:newPosition duration:0.2f];
+        SKAction* stop = [SKAction performSelector:@selector(stopMoving) onTarget:self];
+        SKAction* sequence = [SKAction sequence:@[moveIntoLine, stop]];
+        [self runAction:sequence];
     }
-    NSLog(@"Move %i to %f, %f", place, newPosition.x, newPosition.y);
-    SKAction* moveIntoLine = [SKAction moveTo:newPosition duration:0.5f];
-    SKAction* stop = [SKAction performSelector:@selector(stopMoving) onTarget:self];
-    SKAction* sequence = [SKAction sequence:@[moveIntoLine, stop]];
-    [self runAction:sequence];
 
+    
 }
 
 
