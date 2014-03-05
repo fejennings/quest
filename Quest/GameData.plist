@@ -33,7 +33,7 @@
 					<key>CollisionBodyCoversWhatPercent</key>
 					<real>0.9</real>
 					<key>DebugBody</key>
-					<true/>
+					<false/>
 					<key>FPS</key>
 					<integer>20</integer>
 					<key>UseRestingFrames</key>
@@ -133,7 +133,7 @@
 						<string>back_attack4</string>
 						<string>back_attack5</string>
 					</array>
-					<key>UseAttackParticless</key>
+					<key>UseAttackParticles</key>
 					<true/>
 					<key>AttackParticleFile</key>
 					<string>Spark</string>
@@ -148,13 +148,13 @@
 				</dict>
 				<dict>
 					<key>FollowingEnabled</key>
-					<true/>
+					<false/>
 					<key>BaseFrame</key>
 					<string>character</string>
 					<key>Speed</key>
 					<integer>5</integer>
 					<key>StartLocation</key>
-					<string>{0,0}</string>
+					<string>{100,100}</string>
 					<key>UseForCollisions</key>
 					<true/>
 					<key>CollisionBodyType</key>
@@ -162,7 +162,7 @@
 					<key>CollisionBodyCoversWhatPercent</key>
 					<real>0.9</real>
 					<key>DebugBody</key>
-					<true/>
+					<false/>
 					<key>FPS</key>
 					<integer>20</integer>
 					<key>UseRestingFrames</key>
@@ -262,7 +262,7 @@
 						<string>back_attack4</string>
 						<string>back_attack5</string>
 					</array>
-					<key>UseAttackParticless</key>
+					<key>UseAttackParticles</key>
 					<true/>
 					<key>AttackParticleFile</key>
 					<string>Spark</string>
@@ -277,13 +277,13 @@
 				</dict>
 				<dict>
 					<key>FollowingEnabled</key>
-					<true/>
+					<false/>
 					<key>BaseFrame</key>
-					<string>character</string>
+					<string>blob</string>
 					<key>Speed</key>
 					<integer>5</integer>
 					<key>StartLocation</key>
-					<string>{0,0}</string>
+					<string>{100,-100}</string>
 					<key>UseForCollisions</key>
 					<true/>
 					<key>CollisionBodyType</key>
@@ -291,13 +291,13 @@
 					<key>CollisionBodyCoversWhatPercent</key>
 					<real>0.9</real>
 					<key>DebugBody</key>
-					<true/>
+					<false/>
 					<key>FPS</key>
 					<integer>20</integer>
 					<key>UseRestingFrames</key>
-					<true/>
+					<false/>
 					<key>RestingAtlasFile</key>
-					<string>still</string>
+					<string>blob</string>
 					<key>RestingFrames</key>
 					<array>
 						<string>still_frame1</string>
@@ -311,22 +311,27 @@
 					<key>UseFrontViewFrames</key>
 					<true/>
 					<key>WalkFrontAtlasFile</key>
-					<string>front</string>
+					<string>blob</string>
 					<key>WalkFrontFrames</key>
 					<array>
-						<string>walk_front1</string>
-						<string>walk_front2</string>
-						<string>walk_front3</string>
-						<string>walk_front4</string>
-						<string>walk_front5</string>
-						<string>walk_front6</string>
-						<string>walk_front7</string>
-						<string>walk_front8</string>
+						<string>blob1</string>
+						<string>blob2</string>
+						<string>blob3</string>
+						<string>blob4</string>
+						<string>blob5</string>
+						<string>blob6</string>
+						<string>blob7</string>
+						<string>blob8</string>
+						<string>blob9</string>
+						<string>blob10</string>
+						<string>blob11</string>
+						<string>blob12</string>
+						<string>blob13</string>
 					</array>
 					<key>UseSideViewFrames</key>
-					<true/>
+					<false/>
 					<key>WalkSideAtlasFile</key>
-					<string>side</string>
+					<string>blob</string>
 					<key>WalkSideFrames</key>
 					<array>
 						<string>walk_side1</string>
@@ -339,9 +344,9 @@
 						<string>walk_side8</string>
 					</array>
 					<key>UseBackViewFrames</key>
-					<true/>
+					<false/>
 					<key>WalkBackAtlasFile</key>
-					<string>back</string>
+					<string>blob</string>
 					<key>WalkBackFrames</key>
 					<array>
 						<string>walk_back1</string>
@@ -358,19 +363,19 @@
 					<key>UseFrontAttackFrames</key>
 					<true/>
 					<key>FrontAttackAtlasFile</key>
-					<string>front</string>
+					<string>blob</string>
 					<key>FrontAttackFrames</key>
 					<array>
-						<string>front_attack1</string>
-						<string>front_attack2</string>
-						<string>front_attack3</string>
-						<string>front_attack4</string>
-						<string>front_attack5</string>
+						<string>blob_attack1</string>
+						<string>blob_attack2</string>
+						<string>blob_attack3</string>
+						<string>blob_attack4</string>
+						<string>blob_attack5</string>
 					</array>
 					<key>UseSideAttackFrames</key>
-					<true/>
+					<false/>
 					<key>SideAttackAtlasFile</key>
-					<string>side</string>
+					<string>blob</string>
 					<key>SideAttackFrames</key>
 					<array>
 						<string>side_attack1</string>
@@ -380,9 +385,9 @@
 						<string>side_attack5</string>
 					</array>
 					<key>UseBackAttackFrames</key>
-					<true/>
+					<false/>
 					<key>BackAttackAtlasFile</key>
-					<string>back</string>
+					<string>blob</string>
 					<key>BackAttackFrames</key>
 					<array>
 						<string>back_attack1</string>
@@ -391,10 +396,10 @@
 						<string>back_attack4</string>
 						<string>back_attack5</string>
 					</array>
-					<key>UseAttackParticless</key>
+					<key>UseAttackParticles</key>
 					<true/>
 					<key>AttackParticleFile</key>
-					<string>Spark</string>
+					<string>Magic</string>
 					<key>ParticlesToEmit</key>
 					<integer>15</integer>
 					<key>ParticleDelay</key>

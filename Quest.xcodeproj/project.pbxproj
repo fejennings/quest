@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		013816A818BEDBB9004ED8EB /* Spark.sks in Resources */ = {isa = PBXBuildFile; fileRef = 013816A618BEDBB9004ED8EB /* Spark.sks */; };
+		013816A918BEDBB9004ED8EB /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 013816A718BEDBB9004ED8EB /* spark.png */; };
+		013816AB18BEDCA9004ED8EB /* Magic.sks in Resources */ = {isa = PBXBuildFile; fileRef = 013816AA18BEDCA9004ED8EB /* Magic.sks */; };
+		013816AC18BEDCA9004ED8EB /* Magic.sks in Resources */ = {isa = PBXBuildFile; fileRef = 013816AA18BEDCA9004ED8EB /* Magic.sks */; };
 		019FC49B18394E3300DBAAE6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 019FC49A18394E3300DBAAE6 /* Foundation.framework */; };
 		019FC49D18394E3300DBAAE6 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 019FC49C18394E3300DBAAE6 /* CoreGraphics.framework */; };
 		019FC49F18394E3300DBAAE6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 019FC49E18394E3300DBAAE6 /* UIKit.framework */; };
@@ -54,6 +58,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		013816A618BEDBB9004ED8EB /* Spark.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Spark.sks; sourceTree = "<group>"; };
+		013816A718BEDBB9004ED8EB /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
+		013816AA18BEDCA9004ED8EB /* Magic.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Magic.sks; sourceTree = "<group>"; };
 		019FC49718394E3300DBAAE6 /* Quest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Quest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		019FC49A18394E3300DBAAE6 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		019FC49C18394E3300DBAAE6 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -163,6 +170,9 @@
 				019FC4E2183952B700DBAAE6 /* ACCCharacter.m */,
 				019FC4E5183952E600DBAAE6 /* Constants.h */,
 				019FC4E6183953FE00DBAAE6 /* GameData.plist */,
+				013816A618BEDBB9004ED8EB /* Spark.sks */,
+				013816AA18BEDCA9004ED8EB /* Magic.sks */,
+				013816A718BEDBB9004ED8EB /* spark.png */,
 				019FC4BC18394E3300DBAAE6 /* Images.xcassets */,
 				019FC4E91839608E00DBAAE6 /* front.atlas */,
 				019FC4EC183961A500DBAAE6 /* back.atlas */,
@@ -281,13 +291,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				019FC4F0183961A500DBAAE6 /* back.atlas in Resources */,
+				013816A918BEDBB9004ED8EB /* spark.png in Resources */,
 				019FC4E7183953FE00DBAAE6 /* GameData.plist in Resources */,
 				019FC4EA1839608E00DBAAE6 /* front.atlas in Resources */,
+				013816AB18BEDCA9004ED8EB /* Magic.sks in Resources */,
 				019FC4BD18394E3300DBAAE6 /* Images.xcassets in Resources */,
 				019FC4F6183961A500DBAAE6 /* still.atlas in Resources */,
 				019FC4F4183961A500DBAAE6 /* side.atlas in Resources */,
 				019FC4F2183961A500DBAAE6 /* blob.atlas in Resources */,
 				019FC4B318394E3300DBAAE6 /* Main_iPad.storyboard in Resources */,
+				013816A818BEDBB9004ED8EB /* Spark.sks in Resources */,
 				019FC4B018394E3300DBAAE6 /* Main_iPhone.storyboard in Resources */,
 				019FC4A718394E3300DBAAE6 /* InfoPlist.strings in Resources */,
 			);
@@ -298,6 +311,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				019FC4E8183953FE00DBAAE6 /* GameData.plist in Resources */,
+				013816AC18BEDCA9004ED8EB /* Magic.sks in Resources */,
 				019FC4EB1839608E00DBAAE6 /* front.atlas in Resources */,
 				019FC4F1183961A500DBAAE6 /* back.atlas in Resources */,
 				019FC4CE18394E3300DBAAE6 /* InfoPlist.strings in Resources */,
@@ -543,6 +557,7 @@
 				019FC4D518394E3300DBAAE6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		019FC4D618394E3300DBAAE6 /* Build configuration list for PBXNativeTarget "QuestTests" */ = {
 			isa = XCConfigurationList;
@@ -551,6 +566,7 @@
 				019FC4D818394E3300DBAAE6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

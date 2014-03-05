@@ -264,6 +264,13 @@
 
 -(void) tappedOnce:(UISwipeGestureRecognizer *) recognizer {
     NSLog(@"One Tap");
+    [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
+        // do something if we find a character in myWorld
+        ACCCharacter* character = (ACCCharacter*)node;
+        [character attack];
+        
+     }];
+
 }
 
 -(void) tapToSwitchToSecond:(UISwipeGestureRecognizer *) recognizer {
@@ -290,7 +297,7 @@
 -(void)stopAllPlayersAndPutIntoLine {
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    __block unsigned char leaderDirection;
+    __block unsigned char leaderDirection=[leader returnDirection];
     __block unsigned char place=0;
     
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
@@ -299,12 +306,14 @@
         
             if (character==leader) {
                 
-                leaderDirection=[leader returnDirection];
+                //leaderDirection=[leader returnDirection];
                 [leader stopMoving];
+                [leader rest:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
                 
             } else {
                 
                 [character stopInFormation:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
+                [character rest:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
             }
         place ++;
     }];
