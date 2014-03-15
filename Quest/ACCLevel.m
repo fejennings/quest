@@ -124,7 +124,8 @@
                 if (character.followingEnabled==YES) {
                     leader=character;
                     [leader makeLeader];
-                    [myWorld insertChild:leader atIndex:0];
+// do not reinsert leader  character is already in myWorld
+//                    [myWorld insertChild:leader atIndex:0];
                 }
                 
             }];
@@ -168,15 +169,34 @@
         ACCCharacter* character1 = (ACCCharacter*) firstBody.node;
         ACCCharacter* character2 = (ACCCharacter*) secondBody.node;
         
-        if(character1 == leader) {
+        if (character1 == leader) {
             if (character2.followingEnabled == NO) {
                 character2.followingEnabled = YES;
-                [character2 followIntoPositionWithDirection:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
+              //  [character2 followIntoPositionWithDirection:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
+            } else if (character2.charState == isLiningUp) {
+                [character2 stopMoving];
+                [character2 rest:[leader returnDirection]  andPlaceInLine:1 leaderLocation:leader.position];
             }
             
-        } else if (character2.followingEnabled == NO) {
-            character1.followingEnabled = YES;
-            [character1 followIntoPositionWithDirection:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
+        } else if(character2 == leader) {
+            if (character1.followingEnabled == NO) {
+                character1.followingEnabled = YES;
+                //[character1 followIntoPositionWithDirection:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
+            } else if (character1.charState == isLiningUp) {
+                [character1 stopMoving];
+                [character1 rest:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
+            }
+       
+        } else {
+            
+            if (character2.followingEnabled == YES) {
+                [character2 stopMoving];
+                [character2 rest:[leader returnDirection]  andPlaceInLine:1 leaderLocation:leader.position];
+            }
+            if (character1.followingEnabled == YES) {
+                [character1 stopMoving];
+                [character1 rest:[leader returnDirection]  andPlaceInLine:1 leaderLocation:leader.position];
+            }
            
         }
         
@@ -241,6 +261,7 @@
         ACCCharacter* character = (ACCCharacter*)node;
         gameHasBegun = YES;
         if (self.paused ==NO) {
+            character.charState = isMoving;
             if (character==leader) {
                 [character moveLeftWithPlace:[NSNumber numberWithInt:0]];
             } else {
@@ -261,6 +282,7 @@
         gameHasBegun = YES;
         
         if (self.paused ==NO) {
+            character.charState = isMoving;
             if (character==leader) {
                 [character moveRightWithPlace:[NSNumber numberWithInt:0]];
             } else {
@@ -281,6 +303,7 @@
         gameHasBegun = YES;
         
         if (self.paused ==NO) {
+            character.charState = isMoving;
             if (character==leader) {
                 [character moveUpWithPlace:[NSNumber numberWithInt:0]];
             } else {
@@ -301,6 +324,7 @@
         gameHasBegun = YES;
         
         if (self.paused ==NO) {
+            character.charState = isMoving;
             if (character==leader) {
                 [character moveDownWithPlace:[NSNumber numberWithInt:0]];
             } else {
@@ -439,9 +463,9 @@
             } else {
                 
                 
-                
-                [character stopInFormation:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
-                [character rest:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
+                character.charState = isLiningUp;
+//                [character stopInFormation:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
+//                [character rest:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
                 place ++;
            }
     }];

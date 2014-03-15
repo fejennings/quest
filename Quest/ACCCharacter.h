@@ -18,6 +18,8 @@
 @property (nonatomic, assign) float currentHealth;
 @property (nonatomic, assign) float maxHealth;
 @property (nonatomic, assign) BOOL  hasOwnHealth;
+@property (nonatomic, assign) int charState;
+@property (nonatomic, assign) float charSpeed;
 
 
 -(void)createWithDictionary: (NSDictionary*) charData;

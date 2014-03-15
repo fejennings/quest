@@ -77,6 +77,9 @@
     _followingEnabled = [[characterData objectForKey:@"FollowingEnabled"]  boolValue];
     useForCollisions = [[characterData objectForKey:@"UseForCollisions"]  boolValue];
     speed  = [[characterData objectForKey:@"Speed"]  unsignedCharValue];
+    _charState = isStopped;
+    _charSpeed = 0;
+    
     
     //TEXTURE ....
     
@@ -381,52 +384,52 @@
     //_currentHealth = _currentHealth - 0.25;
     //[self childNodeWithName:@"green"].xScale = _currentHealth/_maxHealth   ;
     
-    if (_followingEnabled == YES || _theLeader == YES) {
-    switch (currentDirection) {
-        case up:
-            self.position = CGPointMake(self.position.x,self.position.y + speed);
+    if ((_followingEnabled == YES || _theLeader == YES) && (_charState == isMoving || _charState == isLiningUp)) {
+        switch (currentDirection) {
+            case up:
+                self.position = CGPointMake(self.position.x,self.position.y + speed);
             
-            if (self.position.x<_idealX && _theLeader == NO){
-                self.position = CGPointMake(self.position.x+1,self.position.y);
-            } else if (self.position.x>_idealX && _theLeader == NO){
-                self.position = CGPointMake(self.position.x-1,self.position.y);
-            }
+                if (self.position.x<_idealX && _theLeader == NO){
+                    self.position = CGPointMake(self.position.x+1,self.position.y);
+                } else if (self.position.x>_idealX && _theLeader == NO){
+                    self.position = CGPointMake(self.position.x-1,self.position.y);
+                }
 
-            break;
-        case down:
-            self.position = CGPointMake(self.position.x,self.position.y - speed);
+                break;
+            case down:
+                self.position = CGPointMake(self.position.x,self.position.y - speed);
             
-            if (self.position.x<_idealX && _theLeader == NO){
-                self.position = CGPointMake(self.position.x+1,self.position.y);
-            } else if (self.position.x>_idealX && _theLeader == NO){
-                self.position = CGPointMake(self.position.x-1,self.position.y);
-            }
+                if (self.position.x<_idealX && _theLeader == NO){
+                    self.position = CGPointMake(self.position.x+1,self.position.y);
+                } else if (self.position.x>_idealX && _theLeader == NO){
+                    self.position = CGPointMake(self.position.x-1,self.position.y);
+                }
            
-            break;
-        case left:
-            self.position = CGPointMake(self.position.x-speed ,self.position.y);
+                break;
+            case left:
+                self.position = CGPointMake(self.position.x-speed ,self.position.y);
             
-            if (self.position.y<_idealY && _theLeader == NO){
-                self.position = CGPointMake(self.position.x,self.position.y+1);
-            } else if (self.position.y>_idealY && _theLeader == NO){
-                self.position = CGPointMake(self.position.x,self.position.y-1);
-            }
+                if (self.position.y<_idealY && _theLeader == NO){
+                    self.position = CGPointMake(self.position.x,self.position.y+1);
+                } else if (self.position.y>_idealY && _theLeader == NO){
+                    self.position = CGPointMake(self.position.x,self.position.y-1);
+                }
             
-            break;
+                break;
         case right:
-            self.position = CGPointMake(self.position.x+ speed,self.position.y );
+                self.position = CGPointMake(self.position.x+ speed,self.position.y );
             
-            if (self.position.y<_idealY && _theLeader == NO){
-                self.position = CGPointMake(self.position.x,self.position.y+1);
-            } else if (self.position.y>_idealY && _theLeader == NO){
-                self.position = CGPointMake(self.position.x,self.position.y-1);
-            }
+                if (self.position.y<_idealY && _theLeader == NO){
+                    self.position = CGPointMake(self.position.x,self.position.y+1);
+                } else if (self.position.y>_idealY && _theLeader == NO){
+                    self.position = CGPointMake(self.position.x,self.position.y-1);
+                }
             
-            break;
+                break;
         case noDirection:
-            //do something if you have to
+                //do something if you have to
             
-            break;
+                break;
         
         default:
             break;
@@ -563,12 +566,13 @@ CGFloat radiansToDegrees(CGFloat radians) {
 -(void)stopMoving {
     
     prevDirection = currentDirection;
-    currentDirection = noDirection;
+    _charState = isStopped;
+    //currentDirection = noDirection;
    // [character removeAllActions];
     
 }
 -(void)stopInFormation:(int)direction andPlaceInLine:(int)place leaderLocation:(CGPoint)location{
-    if (_followingEnabled == YES && currentDirection != noDirection) {
+    if (_followingEnabled == YES && _charState == isLiningUp) {
     
     int paddingX = character.frame.size.width;// / 2;
     int paddingY = character.frame.size.height;// / 2;
