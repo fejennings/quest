@@ -14,8 +14,8 @@
 @property (nonatomic, assign) int idealX;
 @property (nonatomic, assign) int idealY;
 @property (nonatomic, assign) BOOL theLeader;
-@property (nonatomic, assign) BOOL followingEnabed;
-@property (nonatomic, assign) float health;
+@property (nonatomic, assign) BOOL followingEnabled;
+@property (nonatomic, assign) float currentHealth;
 @property (nonatomic, assign) float maxHealth;
 @property (nonatomic, assign) BOOL  hasOwnHealth;
 
@@ -33,7 +33,8 @@
 -(void)followIntoPositionWithDirection:(int)direction andPlaceInLine:(int)place leaderLocation:(CGPoint)location;
 -(void)attack;
 -(void)rest:(int)direction andPlaceInLine:(int)place leaderLocation:(CGPoint)location;
-
+-(void) doDamageWithAmount:(float)amount;
+-(void) removeLeader;
 
 
 @end

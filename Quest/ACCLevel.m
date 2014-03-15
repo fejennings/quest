@@ -9,6 +9,7 @@
 #import "ACCLevel.h"
 #import "Constants.h"
 #import "ACCCharacter.h"
+#import "ACCStartMenu.h"
 
 @interface ACCLevel () {
     
@@ -32,7 +33,9 @@
     unsigned char charactersInWorld;
     
     float followDelay;
+    float levelBorderCausesDamageBy;
     bool useDelayedFollow;
+    BOOL gameHasBegun;
 
 }
 
@@ -59,6 +62,7 @@
         
         currentLevel = 0; // later on will create a singleton to hold game data that is independent of the class
         charactersInWorld = 0;
+        gameHasBegun = NO;
         [self setUpScene];
         [self performSelector:@selector(setUpCharacters) withObject:nil afterDelay:2.0];
         //[self performSelector:@selector(pauseScene) withObject:nil afterDelay:4.0];
@@ -85,15 +89,20 @@
     //NSLog(@" %F",currentTime);
     //0.0333359 seconds between updates   30 fps.
     
+    __block BOOL anyNonLeaderFoundInPLay = NO;
+    __block BOOL leaderFound = NO;
+    
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
         // do something if we find a character in myWorld
         ACCCharacter* character = (ACCCharacter*)node;
         
         if (self.paused ==NO) {
             if (character==leader) {
+                leaderFound = YES;
                 //do something later
             } else {
-                if (character.followingEnabed == YES) {
+                if (character.followingEnabled == YES) {
+                    anyNonLeaderFoundInPLay = YES;
                     character.idealX = leader.position.x;
                     character.idealY = leader.position.y;
                 }
@@ -102,6 +111,31 @@
             [character update];
         }
     }];
+    //outside of enumeration block we test for a leader or a follower
+    
+    if (leaderFound == NO && gameHasBegun == YES) {
+        
+        
+        if (anyNonLeaderFoundInPLay==YES) {
+            NSLog(@"assigning new leader");
+            [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
+                ACCCharacter* character = (ACCCharacter*)node;
+              
+                if (character.followingEnabled==YES) {
+                    leader=character;
+                    [leader makeLeader];
+                    [myWorld insertChild:leader atIndex:0];
+                }
+                
+            }];
+        } else {
+            NSLog((@"Game Over"));
+            gameHasBegun = NO;
+            [self gameOver];
+        }
+        
+        
+    }
 
 }
 
@@ -117,20 +151,31 @@
     if(firstBody.categoryBitMask == wallCategory || secondBody.categoryBitMask == wallCategory) {
         
         NSLog(@"Someone hit the wall");
-    }
-    if(firstBody.categoryBitMask == playerCategory || secondBody.categoryBitMask == playerCategory) {
+        if (firstBody.categoryBitMask == playerCategory) {
+            ACCCharacter* character = (ACCCharacter*) firstBody.node;
+            [character doDamageWithAmount:levelBorderCausesDamageBy];
+            [self stopAllPlayersFromCollision];
+            
+        } else if (secondBody.categoryBitMask == playerCategory) {
+            ACCCharacter* character = (ACCCharacter*) secondBody.node;
+            [character doDamageWithAmount:levelBorderCausesDamageBy];
+            [self stopAllPlayersFromCollision];
+            
+        }
+
+    } else if(firstBody.categoryBitMask == playerCategory || secondBody.categoryBitMask == playerCategory) {
         
         ACCCharacter* character1 = (ACCCharacter*) firstBody.node;
         ACCCharacter* character2 = (ACCCharacter*) secondBody.node;
         
         if(character1 == leader) {
-            if (character2.followingEnabed == NO) {
-                character2.followingEnabed = YES;
+            if (character2.followingEnabled == NO) {
+                character2.followingEnabled = YES;
                 [character2 followIntoPositionWithDirection:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
             }
             
-        } else if (character2.followingEnabed == NO) {
-            character1.followingEnabed = YES;
+        } else if (character2.followingEnabled == NO) {
+            character1.followingEnabled = YES;
             [character1 followIntoPositionWithDirection:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
            
         }
@@ -186,13 +231,15 @@
 
 }
 
+
+
 -(void) handleSwipeLeft:(UISwipeGestureRecognizer *) recognizer {
     NSLog(@"Left");
     __block unsigned char place=0;
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
         // do something if we find a character in myWorld
         ACCCharacter* character = (ACCCharacter*)node;
-        
+        gameHasBegun = YES;
         if (self.paused ==NO) {
             if (character==leader) {
                 [character moveLeftWithPlace:[NSNumber numberWithInt:0]];
@@ -211,6 +258,7 @@
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
         // do something if we find a character in myWorld
         ACCCharacter* character = (ACCCharacter*)node;
+        gameHasBegun = YES;
         
         if (self.paused ==NO) {
             if (character==leader) {
@@ -230,6 +278,7 @@
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
         // do something if we find a character in myWorld
         ACCCharacter* character = (ACCCharacter*)node;
+        gameHasBegun = YES;
         
         if (self.paused ==NO) {
             if (character==leader) {
@@ -249,6 +298,7 @@
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
         // do something if we find a character in myWorld
         ACCCharacter* character = (ACCCharacter*)node;
+        gameHasBegun = YES;
         
         if (self.paused ==NO) {
             if (character==leader) {
@@ -267,6 +317,7 @@
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
         // do something if we find a character in myWorld
         ACCCharacter* character = (ACCCharacter*)node;
+        gameHasBegun = YES;
         [character attack];
         
      }];
@@ -275,10 +326,18 @@
 
 -(void) tapToSwitchToSecond:(UISwipeGestureRecognizer *) recognizer {
     NSLog(@"Two Taps");
+    gameHasBegun = YES;
+
+    [self swithOrder:2];
+
 }
 
 -(void) tapToSwitchToThird:(UISwipeGestureRecognizer *) recognizer {
     NSLog(@"Three Taps");
+    gameHasBegun = YES;
+
+    [self swithOrder:3];
+    
 }
 
 -(void) handleRotation:(UIRotationGestureRecognizer *) recognizer {
@@ -288,17 +347,84 @@
         [self stopAllPlayersAndPutIntoLine];    }
     
     if (recognizer.state == UIGestureRecognizerStateBegan) {
+        gameHasBegun = YES;
         NSLog(@"Rotation Began");
 
     }
 }
 
+#pragma mark Switch Leader
+
+-(void)swithOrder:(int) cycle {
+    __block int i = 1;
+    
+    [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
+        ACCCharacter* character = (ACCCharacter*)node;
+        
+        if (character !=leader && i < cycle) {
+            
+        /*
+         IF its not the leader and following then bump up i
+         If i=cycle then do the following
+         
+         
+         */
+            if(character.followingEnabled==YES) {
+                NSLog(@"assigning new leader");
+                i++;
+                if (i==cycle) {
+                    
+                    //[myWorld indexOfObject:character];
+                    leader.followingEnabled =YES;
+                    [leader removeLeader];
+                
+                    [character makeLeader];
+                    leader=character;
+                    leader.followingEnabled = NO;
+                    }
+
+
+                }
+            }
+       
+    }];
+
+
+}
+
 #pragma  mark STOP ALL CHARACTERS
+
+-(void)stopAllPlayersFromCollision {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    __block unsigned char leaderDirection=[leader returnDirection];
+    __block unsigned char place=1;
+    
+    [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
+        // do something if we find a character in myWorld
+        ACCCharacter* character = (ACCCharacter*)node;
+        
+        if (character==leader) {
+            
+            //leaderDirection=[leader returnDirection];
+            [leader stopMoving];
+            [leader rest:leaderDirection andPlaceInLine:0 leaderLocation:leader.position];
+            
+        } else {
+            
+            [character stopMoving];
+            [character rest:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
+            place ++;
+       }
+    }];
+    
+  
+}
+
 -(void)stopAllPlayersAndPutIntoLine {
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     __block unsigned char leaderDirection=[leader returnDirection];
-    __block unsigned char place=0;
+    __block unsigned char place=1;
     
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
         // do something if we find a character in myWorld
@@ -308,14 +434,16 @@
                 
                 //leaderDirection=[leader returnDirection];
                 [leader stopMoving];
-                [leader rest:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
+                [leader rest:leaderDirection andPlaceInLine:0 leaderLocation:leader.position];
                 
             } else {
                 
+                
+                
                 [character stopInFormation:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
                 [character rest:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
-            }
-        place ++;
+                place ++;
+           }
     }];
     
 }
@@ -376,6 +504,7 @@
     
     useDelayedFollow = [[levelDict objectForKey:@"UseDelayedFollow"]boolValue];
     followDelay = [[levelDict objectForKey:@"FollowDelay"]floatValue];
+    levelBorderCausesDamageBy = [[levelDict objectForKey:@"LevelBorderCausesDamageBy"]floatValue];
     if (useDelayedFollow == NO) {
         followDelay =0.0;
     }
@@ -451,5 +580,17 @@
     
 }
 
+#pragma mark Game Over Man
+
+-(void)gameOver {
+    [myWorld enumerateChildNodesWithName:@"*" usingBlock:^(SKNode *node, BOOL *stop){
+        [node removeFromParent];
+    }];
+    [myWorld removeFromParent];
+    SKScene* nextScene = [[ACCStartMenu alloc] initWithSize:self.size];
+    SKTransition* fade = [SKTransition fadeWithColor:[SKColor blackColor] duration:1.5];
+    [self.view presentScene:nextScene transition:fade];
+
+}
 
 @end

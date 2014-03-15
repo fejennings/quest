@@ -74,7 +74,7 @@
     
     [self addChild:character];
     
-    _followingEnabed = [[characterData objectForKey:@"FollowingEnabled"]  boolValue];
+    _followingEnabled = [[characterData objectForKey:@"FollowingEnabled"]  boolValue];
     useForCollisions = [[characterData objectForKey:@"UseForCollisions"]  boolValue];
     speed  = [[characterData objectForKey:@"Speed"]  unsignedCharValue];
     
@@ -96,6 +96,7 @@
     particleDelay  = [[characterData objectForKey:@"ParticleDelay"]  floatValue];
 
     _hasOwnHealth = [[characterData objectForKey:@"HasOwnHealth"] boolValue];
+    
     
     if (_hasOwnHealth == YES) {
         [self setUpHealthMeter];
@@ -141,7 +142,22 @@
 
 -(void)setUpHealthMeter {
     
-    _
+    _maxHealth = [[characterData objectForKey:@"Health"]floatValue];
+    _currentHealth = _maxHealth;
+    
+    SKSpriteNode* healthBar = [SKSpriteNode spriteNodeWithImageNamed:@"healthbar"];
+    healthBar.zPosition = 200;
+    healthBar.position = CGPointMake(0,(character.frame.size.height/2)+10);
+    [self addChild:healthBar];
+    
+    SKSpriteNode* green = [SKSpriteNode spriteNodeWithImageNamed:@"green"];
+    green.zPosition = 201;
+    green.position = CGPointMake(-(green.frame.size.width/2),(character.frame.size.height/2)+10);
+    green.anchorPoint = CGPointMake(0.0, 0.5);
+    green.name = @"green";
+    [self addChild:green];
+    
+    
     
 }
 
@@ -359,7 +375,13 @@
 
 -(void) update  {
     //NSLog(@"Update called on character");
-    if (_followingEnabed == YES || _theLeader == YES) {
+   
+    
+    //check algorithm for declining health
+    //_currentHealth = _currentHealth - 0.25;
+    //[self childNodeWithName:@"green"].xScale = _currentHealth/_maxHealth   ;
+    
+    if (_followingEnabled == YES || _theLeader == YES) {
     switch (currentDirection) {
         case up:
             self.position = CGPointMake(self.position.x,self.position.y + speed);
@@ -424,7 +446,7 @@ CGFloat radiansToDegrees(CGFloat radians) {
 }
 
 -(void)moveLeftWithPlace:(NSNumber*) place {
-    if (_followingEnabed == YES || _theLeader == YES) {
+    if (_followingEnabled == YES || _theLeader == YES) {
         
         self.zPosition = 100 - [place integerValue]; //converts NSNumber to int
         character.xScale = 1;
@@ -446,7 +468,7 @@ CGFloat radiansToDegrees(CGFloat radians) {
     }
 }
 -(void)moveRightWithPlace:(NSNumber*) place{
-    if (_followingEnabed == YES || _theLeader == YES) {
+    if (_followingEnabled == YES || _theLeader == YES) {
 
         self.zPosition = 100 - [place integerValue]; //converts NSNumber to int
         character.xScale = 1; // flip 100% on the X axis
@@ -468,7 +490,7 @@ CGFloat radiansToDegrees(CGFloat radians) {
     }
 }
 -(void)moveUpWithPlace:(NSNumber*) place{
-    if (_followingEnabed == YES || _theLeader == YES) {
+    if (_followingEnabled == YES || _theLeader == YES) {
         self.zPosition = 100 - [place integerValue]; //converts NSNumber to int
         character.xScale = 1; // flip 100% on the X axis
         
@@ -488,7 +510,7 @@ CGFloat radiansToDegrees(CGFloat radians) {
     }
 }
 -(void)moveDownWithPlace:(NSNumber*) place{
-    if (_followingEnabed == YES || _theLeader == YES) {
+    if (_followingEnabled == YES || _theLeader == YES) {
         self.zPosition = 100 + [place integerValue]; //converts NSNumber to int
         character.xScale = 1; // flip 100% on the X axis
         
@@ -515,7 +537,7 @@ CGFloat radiansToDegrees(CGFloat radians) {
     // indicated for up by x being equal but direction to leader is down
     
     
-    if (_followingEnabed == YES ) {
+    if (_followingEnabled == YES ) {
         if (direction==up ) {
             newPosition = CGPointMake(location.x, location.y - (paddingY*place));
             [self moveUpWithPlace:[NSNumber numberWithInt:place]];
@@ -546,7 +568,7 @@ CGFloat radiansToDegrees(CGFloat radians) {
     
 }
 -(void)stopInFormation:(int)direction andPlaceInLine:(int)place leaderLocation:(CGPoint)location{
-    if (_followingEnabed == YES && currentDirection != noDirection) {
+    if (_followingEnabled == YES && currentDirection != noDirection) {
     
     int paddingX = character.frame.size.width;// / 2;
     int paddingY = character.frame.size.height;// / 2;
@@ -555,6 +577,9 @@ CGFloat radiansToDegrees(CGFloat radians) {
     //Need to add another action if follower has to move "around" the leader
     // indicated for up by x being equal but direction to leader is down
     
+        if (place ==0) {
+            NSLog(@"zero place");
+        }
  
         if (direction==up ) {
                 newPosition = CGPointMake(location.x, location.y - (paddingY*place));
@@ -584,7 +609,7 @@ CGFloat radiansToDegrees(CGFloat radians) {
         //Need to add another action if follower has to move "around" the leader
     // indicated for up by x being equal but direction to leader is down
 
-    if (_followingEnabed == YES || _theLeader) {
+    if (_followingEnabled == YES || _theLeader) {
 
         [character removeAllActions];
         
@@ -603,7 +628,7 @@ CGFloat radiansToDegrees(CGFloat radians) {
         } else {
             //other.
         }
-        NSLog(@"Rest at %i to %f", place, character.zRotation );
+        NSLog(@"Rest%i at %f", place, character.zRotation );
         if (useRestingFrames==YES) {
             if (repeatRest==nil) {
                 [self setUpRest];
@@ -713,9 +738,27 @@ CGFloat radiansToDegrees(CGFloat radians) {
     
     _theLeader = YES;
 }
+-(void) removeLeader {
+    _theLeader = NO;
+}
 -(int)returnDirection {
     return currentDirection;
 }
 
+
+-(void) doDamageWithAmount:(float)amount {
+    
+    _currentHealth = _currentHealth - amount;
+    [self childNodeWithName:@"green"].xScale = _currentHealth / _maxHealth;
+    if (_currentHealth <= 0) {
+        
+        [self enumerateChildNodesWithName:@"*" usingBlock:^(SKNode *node, BOOL *stop){
+            [node removeFromParent ];
+            }];
+        
+        [self removeFromParent];
+    }
+    
+}
 
 @end

@@ -13,6 +13,8 @@
 			<true/>
 			<key>UseDelayedFollow</key>
 			<true/>
+			<key>LevelBorderCausesDamageBy</key>
+			<integer>10</integer>
 			<key>FollowDelay</key>
 			<real>0.25</real>
 			<key>Characters</key>
