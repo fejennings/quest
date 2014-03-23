@@ -244,7 +244,7 @@
     SKAction* sequence = [self setUpAction:atlasName withFrames:atlasFrames waiting:0.5 useWalkFrames:NO timesToAttack:0 withSelectorStr:""];
     repeatRest = [SKAction repeatActionForever:sequence];
     
-    [character runAction:repeatRest];
+    [character runAction:repeatRest withKey:@"Move"];
  
    
     
@@ -288,7 +288,9 @@
     NSMutableArray* atlasTextures= [NSMutableArray arrayWithCapacity:[array count]];
     unsigned char count = 0;
     for (id object in array) {
-        SKTexture* texture = [atlas textureNamed:[array objectAtIndex:count]];
+        //SKTexture* texture = [atlas textureNamed:[array objectAtIndex:count]];
+        SKTexture* texture = [atlas textureNamed:object];
+        
         [atlasTextures addObject:texture];
         count ++;
     }
@@ -340,51 +342,42 @@
     if (repeatRest == Nil) {
         [self setUpRest];
     }
-    if (character.hasActions ==YES) {
-        [character removeAllActions];
-    }
-    [character runAction:repeatRest];
+    [character runAction:repeatRest withKey:@"Move"];
 }
 -(void)runWalkFrontTextures {
     if (walkFrontAction == Nil) {
         [self setUpWalkFront];
     }
-    if (character.hasActions ==YES) {
-        [character removeAllActions];
+    if (_charState==isMoving) {
+        [character runAction:walkFrontAction withKey:@"Move"];
     }
-    [character runAction:walkFrontAction];
 }
 -(void)runWalkSideTextures {
     if (walkSideAction == Nil) {
         [self setUpWalkSide];
     }
-    if (character.hasActions ==YES) {
-        [character removeAllActions];
+    if (_charState==isMoving) {
+        [character runAction:walkSideAction withKey:@"Move"];
     }
-    [character runAction:walkSideAction ];
 }
 -(void)runWalkBackTextures {
     if (walkBackAction == Nil) {
         [self setUpWalkBack];
     }
-    if (character.hasActions ==YES) {
-        [character removeAllActions];
+    if (_charState==isMoving) {
+        [character runAction:walkBackAction withKey:@"Move"];
     }
-    [character runAction:walkBackAction];
 }
 
 
 #pragma mark Update
 
 -(void) update  {
-    //NSLog(@"Update called on character");
-   
     
     //check algorithm for declining health
-    //_currentHealth = _currentHealth - 0.25;
-    //[self childNodeWithName:@"green"].xScale = _currentHealth/_maxHealth   ;
     
-    if ((_followingEnabled == YES || _theLeader == YES) && (_charState == isMoving || _charState == isLiningUp)) {
+    if ((_followingEnabled == YES || _theLeader == YES) && (_charState != isStopped)) { //&& (_charState == isMoving || _charState == isLiningUp)) {
+
         switch (currentDirection) {
             case up:
                 self.position = CGPointMake(self.position.x,self.position.y + speed);
@@ -564,18 +557,24 @@ CGFloat radiansToDegrees(CGFloat radians) {
 #pragma mark STOP Moving
 
 -(void)stopMoving {
-    
+    NSLog(@"Stop Moving");
     prevDirection = currentDirection;
     _charState = isStopped;
-    //currentDirection = noDirection;
-   // [character removeAllActions];
     
 }
+
+-(void)stopMovingFromWallHit {
+    NSLog(@"Stop Moving Wall Hit");
+    prevDirection = currentDirection;
+    _charState = isStopped;
+
+}
 -(void)stopInFormation:(int)direction andPlaceInLine:(int)place leaderLocation:(CGPoint)location{
-    if (_followingEnabled == YES && _charState == isLiningUp) {
+    if (_followingEnabled == YES && currentDirection != noDirection) {
     
     int paddingX = character.frame.size.width;// / 2;
     int paddingY = character.frame.size.height;// / 2;
+    SKAction* rests;
     CGPoint newPosition;
     
     //Need to add another action if follower has to move "around" the leader
@@ -587,19 +586,24 @@ CGFloat radiansToDegrees(CGFloat radians) {
  
         if (direction==up ) {
                 newPosition = CGPointMake(location.x, location.y - (paddingY*place));
+            rests = [SKAction performSelector:@selector(restup) onTarget:self];
         } else if (direction == down) {
-             newPosition = CGPointMake(location.x, location.y + (paddingY*place));
+            newPosition = CGPointMake(location.x, location.y + (paddingY*place));
+            rests = [SKAction performSelector:@selector(restdown) onTarget:self];
         } else if (direction == right) {
              newPosition = CGPointMake(location.x - (paddingX*place), location.y );
+            rests = [SKAction performSelector:@selector(restright) onTarget:self];
          } else if (direction == left) {
              newPosition = CGPointMake(location.x + (paddingX*place), location.y );
+             rests = [SKAction performSelector:@selector(restleft) onTarget:self];
         } else {
              newPosition = self.position; // not in course.  Caused second rotate to put followers on top of each other.
+            NSLog(@"Rest  - Should be here no direction");
         }
         NSLog(@"Move %i to %f, %f", place, newPosition.x, newPosition.y);
         SKAction* moveIntoLine = [SKAction moveTo:newPosition duration:0.2f];
         SKAction* stop = [SKAction performSelector:@selector(stopMoving) onTarget:self];
-        SKAction* sequence = [SKAction sequence:@[moveIntoLine, stop]];
+        SKAction* sequence = [SKAction sequence:@[moveIntoLine, stop, rests]];
         [self runAction:sequence];
  
         
@@ -607,7 +611,20 @@ CGFloat radiansToDegrees(CGFloat radians) {
 
     
 }
--(void)rest:(int)direction andPlaceInLine:(int)place leaderLocation:(CGPoint)location{
+
+-(void)restup {
+    [self rest:up];
+}
+-(void)restdown {
+    [self rest:down];
+}
+-(void)restright {
+    [self rest:right];
+}
+-(void)restleft {
+    [self rest:left];
+}
+-(void)rest:(int) direction {
     
         
         //Need to add another action if follower has to move "around" the leader
@@ -615,30 +632,33 @@ CGFloat radiansToDegrees(CGFloat radians) {
 
     if (_followingEnabled == YES || _theLeader) {
 
-        [character removeAllActions];
+        [character removeActionForKey:@"Move"];
+        _charState = isStopped;
         
         if (direction==up ) {
             character.zRotation = degreesToRadians(180);
-            self.zPosition = 100 - place;
+            //character.zPosition = 100 - place;
         } else if (direction == down) {
-            self.zPosition = 100 + place;
+            //character.zPosition = 100 + place;
             character.zRotation = degreesToRadians(0);
         } else if (direction == right) {
-            self.zPosition = 100 - place;
+            //character.zPosition = 100 - place;
             character.zRotation = degreesToRadians(90);
         } else if (direction == left) {
-            self.zPosition = 100 - place;
+            //character.zPosition = 100 - place;
             character.zRotation = degreesToRadians(-90);
         } else {
             //other.
         }
-        NSLog(@"Rest%i at %f", place, character.zRotation );
+        NSLog(@"Rest at %f", character.zRotation );
         if (useRestingFrames==YES) {
             if (repeatRest==nil) {
                 [self setUpRest];
             }
-            [character runAction:repeatRest];
+            [character runAction:repeatRest withKey:@"Move"];
             
+        } else {
+           // not using resting frames
         }
     }
     
@@ -648,7 +668,7 @@ CGFloat radiansToDegrees(CGFloat radians) {
 
 -(void)attack {
     
-    if (_theLeader==YES || doesAttackWhenNotLeader == YES) {
+    if ((_theLeader==YES || doesAttackWhenNotLeader == YES) && _charState ==isMoving) {
         if (currentDirection ==down && useFrontAttackFrames == YES) {
             [character removeAllActions];
             if (frontAttackAction==nil) {
@@ -749,16 +769,53 @@ CGFloat radiansToDegrees(CGFloat radians) {
     return currentDirection;
 }
 
+#pragma mark Do Damage
 
 -(void) doDamageWithAmount:(float)amount {
     
     _currentHealth = _currentHealth - amount;
+    
+    if(_currentHealth<0) {
+        _currentHealth =0;
+    }
     [self childNodeWithName:@"green"].xScale = _currentHealth / _maxHealth;
+    [self performSelector:@selector(damageActions) withObject:Nil afterDelay:0.05];
+}
+
+-(void) damageActions {
+    
+    SKAction* push;
+    SKAction* pulseRed = [SKAction sequence:@[
+                                              [SKAction colorizeWithColor:[SKColor redColor] colorBlendFactor:1.0 duration:0.5],
+                                              [SKAction colorizeWithColorBlendFactor:0.0 duration:0.5],
+                                              ]];
+    [character runAction:pulseRed];
+    if (currentDirection == left) {
+        push = [SKAction moveByX:100 y:0 duration:0.2];
+        
+    } else     if (currentDirection == right) {
+        push = [SKAction moveByX:-100 y:0 duration:0.2];
+        
+    } else     if (currentDirection == up) {
+        push = [SKAction moveByX:0 y:-100 duration:0.2];
+        
+    } else     if (currentDirection == down) {
+        push = [SKAction moveByX:0 y:100 duration:0.2];
+        
+    }
+    [self runAction:push];
+    [self performSelector:@selector(damageDone) withObject:Nil afterDelay:0.021];
+
+    
+}
+
+-(void) damageDone {
+    prevDirection=currentDirection;
     if (_currentHealth <= 0) {
         
         [self enumerateChildNodesWithName:@"*" usingBlock:^(SKNode *node, BOOL *stop){
             [node removeFromParent ];
-            }];
+        }];
         
         [self removeFromParent];
     }

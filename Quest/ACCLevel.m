@@ -46,19 +46,7 @@
 
 -(id)initWithSize:(CGSize)size {
     if (self = [super initWithSize:size]) {
-        /* Setup your scene here
-        
-        self.backgroundColor = [SKColor colorWithRed:0.15 green:0.15 blue:0.3 alpha:1.0];
-        
-        SKLabelNode *myLabel = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
-        
-        myLabel.text = @"Hello, Level";
-        myLabel.fontSize = 30;
-        myLabel.position = CGPointMake(CGRectGetMidX(self.frame),
-                                       CGRectGetMidY(self.frame));
-        
-        [self addChild:myLabel];
-         */
+
         
         currentLevel = 0; // later on will create a singleton to hold game data that is independent of the class
         charactersInWorld = 0;
@@ -124,8 +112,8 @@
                 if (character.followingEnabled==YES) {
                     leader=character;
                     [leader makeLeader];
-// do not reinsert leader  character is already in myWorld
-//                    [myWorld insertChild:leader atIndex:0];
+// maybe do not reinsert leader  character is already in myWorld
+                    [myWorld insertChild:leader atIndex:0];
                 }
                 
             }];
@@ -154,14 +142,14 @@
         NSLog(@"Someone hit the wall");
         if (firstBody.categoryBitMask == playerCategory) {
             ACCCharacter* character = (ACCCharacter*) firstBody.node;
+            [self stopAllPlayersFromCollision:character];
             [character doDamageWithAmount:levelBorderCausesDamageBy];
-            [self stopAllPlayersFromCollision];
             
         } else if (secondBody.categoryBitMask == playerCategory) {
             ACCCharacter* character = (ACCCharacter*) secondBody.node;
+            [self stopAllPlayersFromCollision:character];
             [character doDamageWithAmount:levelBorderCausesDamageBy];
-            [self stopAllPlayersFromCollision];
-            
+          
         }
 
     } else if(firstBody.categoryBitMask == playerCategory || secondBody.categoryBitMask == playerCategory) {
@@ -172,30 +160,14 @@
         if (character1 == leader) {
             if (character2.followingEnabled == NO) {
                 character2.followingEnabled = YES;
-              //  [character2 followIntoPositionWithDirection:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
-            } else if (character2.charState == isLiningUp) {
-                [character2 stopMoving];
-                [character2 rest:[leader returnDirection]  andPlaceInLine:1 leaderLocation:leader.position];
+                [character2 followIntoPositionWithDirection:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
             }
             
-        } else if(character2 == leader) {
+        } else if (character2 == leader) {
+            
             if (character1.followingEnabled == NO) {
                 character1.followingEnabled = YES;
-                //[character1 followIntoPositionWithDirection:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
-            } else if (character1.charState == isLiningUp) {
-                [character1 stopMoving];
-                [character1 rest:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
-            }
-       
-        } else {
-            
-            if (character2.followingEnabled == YES) {
-                [character2 stopMoving];
-                [character2 rest:[leader returnDirection]  andPlaceInLine:1 leaderLocation:leader.position];
-            }
-            if (character1.followingEnabled == YES) {
-                [character1 stopMoving];
-                [character1 rest:[leader returnDirection]  andPlaceInLine:1 leaderLocation:leader.position];
+                [character1 followIntoPositionWithDirection:[leader returnDirection] andPlaceInLine:1 leaderLocation:leader.position];
             }
            
         }
@@ -265,11 +237,11 @@
             if (character==leader) {
                 [character moveLeftWithPlace:[NSNumber numberWithInt:0]];
             } else {
-                [character performSelector:@selector(moveLeftWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(place*followDelay)];
-//                [character moveLeftWithPlace:[NSNumber numberWithInt:place]];
+                place ++;
+
+                [character performSelector:@selector(moveLeftWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(followDelay)];
             }
         }
-        place ++;
     }];
 }
 
@@ -286,11 +258,12 @@
             if (character==leader) {
                 [character moveRightWithPlace:[NSNumber numberWithInt:0]];
             } else {
-                [character performSelector:@selector(moveRightWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(place*followDelay)];
-//                [character moveRightWithPlace:[NSNumber numberWithInt:place]];
+                place ++;
+
+                [character performSelector:@selector(moveRightWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(followDelay)];
             }
         }
-        place ++;
+      
     }];
 }
 
@@ -307,11 +280,11 @@
             if (character==leader) {
                 [character moveUpWithPlace:[NSNumber numberWithInt:0]];
             } else {
-                [character performSelector:@selector(moveUpWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(place*followDelay)];
-//                [character moveUpWithPlace:[NSNumber numberWithInt:place]];
+                place ++;
+
+                [character performSelector:@selector(moveUpWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(followDelay)];
             }
         }
-        place ++;
     }];
 }
 
@@ -328,13 +301,13 @@
             if (character==leader) {
                 [character moveDownWithPlace:[NSNumber numberWithInt:0]];
             } else {
-                [character performSelector:@selector(moveDownWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(place*followDelay)];
-//                [character moveDownWithPlace:[NSNumber numberWithInt:place]];
+                place ++;
+                [character performSelector:@selector(moveDownWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(followDelay)];
             }
         }
-        place ++;
     }];
 }
+
 
 -(void) tappedOnce:(UISwipeGestureRecognizer *) recognizer {
     NSLog(@"One Tap");
@@ -404,7 +377,7 @@
                 
                     [character makeLeader];
                     leader=character;
-                    leader.followingEnabled = NO;
+                
                     }
 
 
@@ -418,26 +391,25 @@
 
 #pragma  mark STOP ALL CHARACTERS
 
--(void)stopAllPlayersFromCollision {
+-(void)stopAllPlayersFromCollision:(SKNode*) damagedNode {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-    __block unsigned char leaderDirection=[leader returnDirection];
-    __block unsigned char place=1;
     
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
         // do something if we find a character in myWorld
         ACCCharacter* character = (ACCCharacter*)node;
         
-        if (character==leader) {
+        int leaderDirection=[leader returnDirection];
+
+        if (character == damagedNode) {
             
-            //leaderDirection=[leader returnDirection];
-            [leader stopMoving];
-            [leader rest:leaderDirection andPlaceInLine:0 leaderLocation:leader.position];
+//fej            [character removeAllActions];
+            [character stopMovingFromWallHit];
+            [character rest:leaderDirection];
             
         } else {
-            
+//fej            [character removeAllActions];
             [character stopMoving];
-            [character rest:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
-            place ++;
+            [character rest:leaderDirection];
        }
     }];
     
@@ -456,16 +428,14 @@
         
             if (character==leader) {
                 
-                //leaderDirection=[leader returnDirection];
                 [leader stopMoving];
-                [leader rest:leaderDirection andPlaceInLine:0 leaderLocation:leader.position];
+                [leader rest:leaderDirection];
                 
             } else {
                 
                 
                 character.charState = isLiningUp;
-//                [character stopInFormation:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
-//                [character rest:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
+                [character stopInFormation:leaderDirection andPlaceInLine:place leaderLocation:leader.position];
                 place ++;
            }
     }];
@@ -526,6 +496,33 @@
     map.position = CGPointMake(0, 0);
     [myWorld addChild:map];
     
+    SKNode* instructionNode = [SKNode node];
+    instructionNode.name = @"instructions";
+    [myWorld addChild:instructionNode];
+    instructionNode.position = CGPointMake(0,0);
+    instructionNode.zPosition = 50;
+    
+    SKLabelNode* label1 = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
+    label1.fontSize = 22;
+    label1.position = CGPointMake(0, 50);
+    label1.text = @"Swipe to Move, Rotate to Stop";
+    
+    SKLabelNode* label2 = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
+    label2.fontSize = 22;
+    label2.position = CGPointMake(0, -50);
+    label2.text = @"Touch 2 or 3 fingers to Swap Leaders";
+    
+    [instructionNode addChild:label1];
+    [instructionNode addChild:label2];
+    
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+        
+        label1.fontSize = 15;
+        label2.fontSize = 15;
+    }
+
+    
+    
     useDelayedFollow = [[levelDict objectForKey:@"UseDelayedFollow"]boolValue];
     followDelay = [[levelDict objectForKey:@"FollowDelay"]floatValue];
     levelBorderCausesDamageBy = [[levelDict objectForKey:@"LevelBorderCausesDamageBy"]floatValue];
@@ -555,11 +552,21 @@
 
 }
 
+-(void)fadeToDeath:(SKNode*) node  {
+    SKAction* fade = [SKAction fadeAlphaTo:0 duration:10];
+    SKAction* remove= [SKAction performSelector:@selector(removeFromParent) onTarget:node];
+    SKAction* sequence = [SKAction sequence:@[fade,remove]];
+    [node runAction:sequence];
+    
+}
+
 #pragma mark Setup Characters
 
 -(void) setUpCharacters {
     NSLog(@"setup leader");
     
+    [self fadeToDeath:[myWorld childNodeWithName:@"instructions"]];
+     
     leader = [ACCCharacter node];
     [leader createWithDictionary:[characterArray objectAtIndex:0]];
     [leader makeLeader];

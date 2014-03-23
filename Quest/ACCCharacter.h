@@ -31,10 +31,11 @@
 -(void)makeLeader;
 -(int)returnDirection;
 -(void)stopMoving;
+-(void)stopMovingFromWallHit;
 -(void)stopInFormation:(int)direction andPlaceInLine:(int)place leaderLocation:(CGPoint)location;
 -(void)followIntoPositionWithDirection:(int)direction andPlaceInLine:(int)place leaderLocation:(CGPoint)location;
 -(void)attack;
--(void)rest:(int)direction andPlaceInLine:(int)place leaderLocation:(CGPoint)location;
+-(void)rest:(int) direction;
 -(void) doDamageWithAmount:(float)amount;
 -(void) removeLeader;
 
