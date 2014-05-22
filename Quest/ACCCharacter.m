@@ -30,6 +30,7 @@
     bool useBackAttackFrames;
     bool doesAttackWhenNotLeader;
     bool useAttackParticles;
+    bool isTouchable;
     
     float particleDelay;
     int particlesToEmit;
@@ -94,6 +95,7 @@
     useBackAttackFrames= [[characterData objectForKey:@"UseBackAttackFrames"]  boolValue];
     doesAttackWhenNotLeader= [[characterData objectForKey:@"DoesAttackWhenNotLeader"]  boolValue];
     useAttackParticles= [[characterData objectForKey:@"UseAttackParticles"]  boolValue];
+    isTouchable= [[characterData objectForKey:@"IsTouchable"]  boolValue];
     particlesToEmit  = [[characterData objectForKey:@"ParticlesToEmit"]  intValue];
 
     particleDelay  = [[characterData objectForKey:@"ParticleDelay"]  floatValue];
@@ -187,8 +189,8 @@
     self.physicsBody.allowsRotation = NO;
     
     self.physicsBody.categoryBitMask = playerCategory;
-    self.physicsBody.collisionBitMask = wallCategory | playerCategory;
-    self.physicsBody.contactTestBitMask = wallCategory | playerCategory; // sepearate other characters with pipe | playerCategory
+    self.physicsBody.collisionBitMask = wallCategory | playerCategory | coinCategory | obstacleCategory;
+    self.physicsBody.contactTestBitMask = wallCategory | playerCategory | coinCategory | obstacleCategory; // sepearate other characters with pipe | playerCategory
     
     
 }
@@ -761,12 +763,28 @@ CGFloat radiansToDegrees(CGFloat radians) {
 -(void) makeLeader {
     
     _theLeader = YES;
+
 }
 -(void) removeLeader {
     _theLeader = NO;
 }
 -(int)returnDirection {
     return currentDirection;
+}
+
+#pragma mark leader tochable Stuff
+-(BOOL)isTouchable {
+    return isTouchable;
+}
+
+-(void)touched {
+    if (_followingEnabled == NO) {
+        //display info
+    } else if (_theLeader == NO){
+        //make leader
+    } else {
+        //do something as leader
+    }
 }
 
 #pragma mark Do Damage
@@ -812,14 +830,36 @@ CGFloat radiansToDegrees(CGFloat radians) {
 -(void) damageDone {
     prevDirection=currentDirection;
     if (_currentHealth <= 0) {
-        
+  
         [self enumerateChildNodesWithName:@"*" usingBlock:^(SKNode *node, BOOL *stop){
             [node removeFromParent ];
         }];
         
-        [self removeFromParent];
+        _isDying=YES;
+        
+        [self deathEmitter];
+        
+        self.physicsBody.dynamic=NO;
+        self.physicsBody = nil;
+        
+        [self performSelector:@selector(removeFromParent) withObject:nil afterDelay:1.0];
+
+        
     }
     
+    
 }
+
+-(void)deathEmitter {
+    NSString* emitterPath = [[NSBundle mainBundle] pathForResource:[characterData objectForKey:@"DeathFire"] ofType:@"sks"];
+    SKEmitterNode* emitter = [NSKeyedUnarchiver unarchiveObjectWithFile:emitterPath];
+    emitter.zPosition = 150;
+    emitter.position = CGPointMake(0,- (character.frame.size.height/2)+10);
+    emitter.numParticlesToEmit=150;
+    
+    [self addChild:emitter];
+    
+}
+
 
 @end

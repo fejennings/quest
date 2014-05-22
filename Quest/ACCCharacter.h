@@ -20,6 +20,7 @@
 @property (nonatomic, assign) BOOL  hasOwnHealth;
 @property (nonatomic, assign) int charState;
 @property (nonatomic, assign) float charSpeed;
+@property (nonatomic, assign) BOOL isDying;
 
 
 -(void)createWithDictionary: (NSDictionary*) charData;
@@ -38,6 +39,8 @@
 -(void)rest:(int) direction;
 -(void) doDamageWithAmount:(float)amount;
 -(void) removeLeader;
+-(BOOL)isTouchable;
+-(void)touched;
 
 
 @end

@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01052D5618DFB147008FA2DD /* DeathFire.sks in Resources */ = {isa = PBXBuildFile; fileRef = 01052D5518DFB147008FA2DD /* DeathFire.sks */; };
+		01052D5718DFB147008FA2DD /* DeathFire.sks in Resources */ = {isa = PBXBuildFile; fileRef = 01052D5518DFB147008FA2DD /* DeathFire.sks */; };
+		01052D5A18DFB6BD008FA2DD /* ACCCoins.m in Sources */ = {isa = PBXBuildFile; fileRef = 01052D5918DFB6BD008FA2DD /* ACCCoins.m */; };
+		01052D5B18DFB6BD008FA2DD /* ACCCoins.m in Sources */ = {isa = PBXBuildFile; fileRef = 01052D5918DFB6BD008FA2DD /* ACCCoins.m */; };
+		01052D5E18E5DB0F008FA2DD /* ACCWalls.m in Sources */ = {isa = PBXBuildFile; fileRef = 01052D5D18E5DB0F008FA2DD /* ACCWalls.m */; };
+		01052D5F18E5DB0F008FA2DD /* ACCWalls.m in Sources */ = {isa = PBXBuildFile; fileRef = 01052D5D18E5DB0F008FA2DD /* ACCWalls.m */; };
 		013816A818BEDBB9004ED8EB /* Spark.sks in Resources */ = {isa = PBXBuildFile; fileRef = 013816A618BEDBB9004ED8EB /* Spark.sks */; };
 		013816A918BEDBB9004ED8EB /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 013816A718BEDBB9004ED8EB /* spark.png */; };
 		013816AB18BEDCA9004ED8EB /* Magic.sks in Resources */ = {isa = PBXBuildFile; fileRef = 013816AA18BEDCA9004ED8EB /* Magic.sks */; };
@@ -58,6 +64,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		01052D5518DFB147008FA2DD /* DeathFire.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = DeathFire.sks; sourceTree = "<group>"; };
+		01052D5818DFB6BD008FA2DD /* ACCCoins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ACCCoins.h; sourceTree = "<group>"; };
+		01052D5918DFB6BD008FA2DD /* ACCCoins.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ACCCoins.m; sourceTree = "<group>"; };
+		01052D5C18E5DB0F008FA2DD /* ACCWalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ACCWalls.h; sourceTree = "<group>"; };
+		01052D5D18E5DB0F008FA2DD /* ACCWalls.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ACCWalls.m; sourceTree = "<group>"; };
 		013816A618BEDBB9004ED8EB /* Spark.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Spark.sks; sourceTree = "<group>"; };
 		013816A718BEDBB9004ED8EB /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		013816AA18BEDCA9004ED8EB /* Magic.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Magic.sks; sourceTree = "<group>"; };
@@ -168,6 +179,11 @@
 				019FC4DE183951FB00DBAAE6 /* ACCStartMenu.m */,
 				019FC4E1183952B700DBAAE6 /* ACCCharacter.h */,
 				019FC4E2183952B700DBAAE6 /* ACCCharacter.m */,
+				01052D5818DFB6BD008FA2DD /* ACCCoins.h */,
+				01052D5918DFB6BD008FA2DD /* ACCCoins.m */,
+				01052D5C18E5DB0F008FA2DD /* ACCWalls.h */,
+				01052D5D18E5DB0F008FA2DD /* ACCWalls.m */,
+				01052D5518DFB147008FA2DD /* DeathFire.sks */,
 				019FC4E5183952E600DBAAE6 /* Constants.h */,
 				019FC4E6183953FE00DBAAE6 /* GameData.plist */,
 				013816A618BEDBB9004ED8EB /* Spark.sks */,
@@ -296,6 +312,7 @@
 				019FC4EA1839608E00DBAAE6 /* front.atlas in Resources */,
 				013816AB18BEDCA9004ED8EB /* Magic.sks in Resources */,
 				019FC4BD18394E3300DBAAE6 /* Images.xcassets in Resources */,
+				01052D5618DFB147008FA2DD /* DeathFire.sks in Resources */,
 				019FC4F6183961A500DBAAE6 /* still.atlas in Resources */,
 				019FC4F4183961A500DBAAE6 /* side.atlas in Resources */,
 				019FC4F2183961A500DBAAE6 /* blob.atlas in Resources */,
@@ -317,6 +334,7 @@
 				019FC4CE18394E3300DBAAE6 /* InfoPlist.strings in Resources */,
 				019FC4F5183961A500DBAAE6 /* side.atlas in Resources */,
 				019FC4F7183961A500DBAAE6 /* still.atlas in Resources */,
+				01052D5718DFB147008FA2DD /* DeathFire.sks in Resources */,
 				019FC4F3183961A500DBAAE6 /* blob.atlas in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -333,7 +351,9 @@
 				019FC4B618394E3300DBAAE6 /* ACCViewController.m in Sources */,
 				019FC4E3183952B700DBAAE6 /* ACCCharacter.m in Sources */,
 				019FC4DF183951FB00DBAAE6 /* ACCStartMenu.m in Sources */,
+				01052D5A18DFB6BD008FA2DD /* ACCCoins.m in Sources */,
 				019FC4A918394E3300DBAAE6 /* main.m in Sources */,
+				01052D5E18E5DB0F008FA2DD /* ACCWalls.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,6 +362,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				019FC4DC18394ED000DBAAE6 /* ACCLevel.m in Sources */,
+				01052D5F18E5DB0F008FA2DD /* ACCWalls.m in Sources */,
+				01052D5B18DFB6BD008FA2DD /* ACCCoins.m in Sources */,
 				019FC4E4183952B700DBAAE6 /* ACCCharacter.m in Sources */,
 				019FC4D018394E3300DBAAE6 /* QuestTests.m in Sources */,
 				019FC4E0183951FB00DBAAE6 /* ACCStartMenu.m in Sources */,

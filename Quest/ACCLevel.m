@@ -10,6 +10,8 @@
 #import "Constants.h"
 #import "ACCCharacter.h"
 #import "ACCStartMenu.h"
+#import "ACCCoins.h"
+#import "ACCWalls.h"
 
 @interface ACCLevel () {
     
@@ -28,6 +30,7 @@
     UITapGestureRecognizer* twoFingerTap;
     UITapGestureRecognizer* threeFingerTap;
     UIRotationGestureRecognizer* rotationGR;
+    UITapGestureRecognizer* doubleTap;
     NSNumber* maxFollowers;
     
     unsigned char charactersInWorld;
@@ -86,7 +89,9 @@
         
         if (self.paused ==NO) {
             if (character==leader) {
-                leaderFound = YES;
+                if (leader.isDying==NO) {
+                        leaderFound = YES;
+                }
                 //do something later
             } else {
                 if (character.followingEnabled == YES) {
@@ -152,7 +157,42 @@
           
         }
 
-    } else if(firstBody.categoryBitMask == playerCategory || secondBody.categoryBitMask == playerCategory) {
+    }
+    
+    if(firstBody.categoryBitMask == obstacleCategory || secondBody.categoryBitMask == obstacleCategory) {
+        
+        NSLog(@"Someone hit an obstacle");
+        if (firstBody.categoryBitMask == playerCategory) {
+            ACCCharacter* character = (ACCCharacter*) firstBody.node;
+            [self stopAllPlayersFromCollision:character];
+            [character doDamageWithAmount:levelBorderCausesDamageBy];
+            
+        } else if (secondBody.categoryBitMask == playerCategory) {
+            ACCCharacter* character = (ACCCharacter*) secondBody.node;
+            [self stopAllPlayersFromCollision:character];
+            [character doDamageWithAmount:levelBorderCausesDamageBy];
+            
+        }
+        
+    }
+
+    
+    if(firstBody.categoryBitMask == coinCategory || secondBody.categoryBitMask == coinCategory) {
+        
+        NSLog(@"Someone got a coin");
+        if (firstBody.categoryBitMask == coinCategory) {
+            ACCCoins* coin = (ACCCoins*) firstBody.node;
+            [coin removeFromParent];
+            
+        } else if (secondBody.categoryBitMask == coinCategory) {
+            ACCCoins* coin = (ACCCoins*) secondBody.node;
+            [coin removeFromParent];
+            
+        }
+        
+    }
+
+    if(firstBody.categoryBitMask == playerCategory && secondBody.categoryBitMask == playerCategory) {
         
         ACCCharacter* character1 = (ACCCharacter*) firstBody.node;
         ACCCharacter* character2 = (ACCCharacter*) secondBody.node;
@@ -206,6 +246,12 @@
     tapOnce.numberOfTouchesRequired = 1;
     [view addGestureRecognizer:tapOnce];
     
+    doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
+    doubleTap.numberOfTapsRequired = 2;
+    doubleTap.numberOfTouchesRequired = 1;
+    [view addGestureRecognizer:doubleTap];
+    [tapOnce requireGestureRecognizerToFail:doubleTap];
+
     twoFingerTap = [[UITapGestureRecognizer alloc] initWithTarget:self  action:@selector(tapToSwitchToSecond:)];
     twoFingerTap.numberOfTapsRequired = 1;
     twoFingerTap.numberOfTouchesRequired = 2;
@@ -231,6 +277,7 @@
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
         // do something if we find a character in myWorld
         ACCCharacter* character = (ACCCharacter*)node;
+        int prevState = character.charState;
         gameHasBegun = YES;
         if (self.paused ==NO) {
             character.charState = isMoving;
@@ -239,7 +286,7 @@
             } else {
                 place ++;
 
-                [character performSelector:@selector(moveLeftWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(followDelay)];
+                [character performSelector:@selector(moveLeftWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:((prevState!=isStopped)*followDelay)];
             }
         }
     }];
@@ -251,6 +298,7 @@
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
         // do something if we find a character in myWorld
         ACCCharacter* character = (ACCCharacter*)node;
+        int prevState = character.charState;
         gameHasBegun = YES;
         
         if (self.paused ==NO) {
@@ -260,7 +308,7 @@
             } else {
                 place ++;
 
-                [character performSelector:@selector(moveRightWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(followDelay)];
+                [character performSelector:@selector(moveRightWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:((prevState!=isStopped)*followDelay)];
             }
         }
       
@@ -273,6 +321,7 @@
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
         // do something if we find a character in myWorld
         ACCCharacter* character = (ACCCharacter*)node;
+        int prevState = character.charState;
         gameHasBegun = YES;
         
         if (self.paused ==NO) {
@@ -282,7 +331,7 @@
             } else {
                 place ++;
 
-                [character performSelector:@selector(moveUpWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(followDelay)];
+                [character performSelector:@selector(moveUpWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:((prevState!=isStopped)*followDelay)];
             }
         }
     }];
@@ -294,6 +343,7 @@
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
         // do something if we find a character in myWorld
         ACCCharacter* character = (ACCCharacter*)node;
+        int prevState = character.charState;
         gameHasBegun = YES;
         
         if (self.paused ==NO) {
@@ -302,14 +352,14 @@
                 [character moveDownWithPlace:[NSNumber numberWithInt:0]];
             } else {
                 place ++;
-                [character performSelector:@selector(moveDownWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:(followDelay)];
+                [character performSelector:@selector(moveDownWithPlace:) withObject:[NSNumber numberWithInt:place] afterDelay:((prevState!=isStopped)*followDelay)];
             }
         }
     }];
 }
 
 
--(void) tappedOnce:(UISwipeGestureRecognizer *) recognizer {
+-(void) tappedOnce:(UITapGestureRecognizer *) recognizer {
     NSLog(@"One Tap");
     [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
         // do something if we find a character in myWorld
@@ -321,7 +371,45 @@
 
 }
 
--(void) tapToSwitchToSecond:(UISwipeGestureRecognizer *) recognizer {
+-(void) doubleTap:(UITapGestureRecognizer *) recognizer {
+    NSLog(@"Double Tap");
+    
+    if(recognizer.state == UIGestureRecognizerStateEnded) {
+        
+        CGPoint touchLocation;
+        BOOL touchableNodeFound=NO;
+
+        touchLocation = [recognizer locationInView:recognizer.view];
+        NSLog(@"View Location %f , %f",touchLocation.x,touchLocation.y);
+        touchLocation = [self convertPointFromView:touchLocation];
+    
+        //SKNode *touchedNode;// = (SKSpriteNode *)[self nodeAtPoint:touchLocation];
+        NSArray*touchedNodes = (NSArray *)[self nodesAtPoint:touchLocation];
+        NSLog(@"Scene Location %f , %f",touchLocation.x,touchLocation.y);
+        NSLog(@"Node %@",touchedNodes);
+        for (id object in touchedNodes) {
+            //SKSpriteNode *touchedNode = id;
+            if ([object isMemberOfClass:[ACCCharacter class]])  {
+                //SKNode* touchedNode = object;
+                //NSLog(@"Name %@", touchedNode.name);
+                //if ([touchedNode.name  isEqual: @"character"]) {
+        
+                    ACCCharacter* touchedNode = object;
+                
+                    if ([touchedNode isTouchable]) {
+                        touchableNodeFound=YES;
+                        if ([touchedNode isEqual:leader]) {
+                            [self stopAllPlayers];
+                        }
+                        [touchedNode touched];
+                    }
+                //}
+            }
+        }
+    }
+    
+}
+-(void) tapToSwitchToSecond:(UITapGestureRecognizer *) recognizer {
     NSLog(@"Two Taps");
     gameHasBegun = YES;
 
@@ -329,7 +417,7 @@
 
 }
 
--(void) tapToSwitchToThird:(UISwipeGestureRecognizer *) recognizer {
+-(void) tapToSwitchToThird:(UITapGestureRecognizer *) recognizer {
     NSLog(@"Three Taps");
     gameHasBegun = YES;
 
@@ -415,7 +503,22 @@
     
   
 }
-
+-(void)stopAllPlayers {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self];
+    
+    [myWorld enumerateChildNodesWithName:@"character" usingBlock:^(SKNode *node, BOOL *stop) {
+        // do something if we find a character in myWorld
+        ACCCharacter* character = (ACCCharacter*)node;
+        
+        int leaderDirection=[leader returnDirection];
+        
+            //fej            [character removeAllActions];
+        [character stopMoving];
+        [character rest:leaderDirection];
+    }];
+    
+    
+}
 -(void)stopAllPlayersAndPutIntoLine {
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
@@ -548,6 +651,13 @@
     if ( [[levelDict objectForKey:@"DebugBorder"] boolValue] == YES ) {
         [self debugPath:mapWithSmallerRect];
     }
+    
+    NSArray* coinArray = [NSArray arrayWithArray:[levelDict objectForKey:@"Coins"]];
+    [self setupCoins:coinArray];
+    
+    NSArray* wallArray = [NSArray arrayWithArray:[levelDict objectForKey:@"Walls"]];
+    [self setupWalls:wallArray];
+    
 
 
 }
@@ -582,6 +692,8 @@
     
 }
 
+
+
 -(void) createAnotherCharacter {
     
     ++charactersInWorld ;
@@ -610,6 +722,42 @@
     
     
 }
+#pragma mark Setup Coins
+-(void) setupCoins:(NSArray *)theArray {
+    
+    int c = 0;
+    while (c<[theArray count]) {
+        ACCCoins* newCoin= [ACCCoins node];
+        NSDictionary* coinDict = [NSDictionary dictionaryWithDictionary:[theArray objectAtIndex:c]];
+        NSString* baseString = [NSString stringWithString:[coinDict objectForKey:@"BaseFrame"]];
+        CGPoint coinLocation = CGPointFromString([coinDict objectForKey:@"StartLocation"]);
+        
+        [newCoin createWithBaseImage:baseString andLocation:coinLocation ];
+        [myWorld addChild:newCoin];
+        c++;
+    }
+    
+    
+}
+#pragma mark Setup Walls
+-(void) setupWalls:(NSArray *)theArray {
+    
+    int c = 0;
+    while (c<[theArray count]) {
+        ACCWalls* newWall= [ACCWalls node];
+        NSDictionary* wallDict = [NSDictionary dictionaryWithDictionary:[theArray objectAtIndex:c]];
+        NSString* baseString = [NSString stringWithString:[wallDict objectForKey:@"BaseFrame"]];
+        CGPoint wallLocation = CGPointFromString([wallDict objectForKey:@"StartLocation"]);
+        float wallRotation = [[wallDict objectForKey:@"Rotation"] floatValue];
+
+        [newWall createWithBaseImage:baseString andLocation:wallLocation andRotation:wallRotation ];
+        [myWorld addChild:newWall];
+        c++;
+    }
+    
+    
+}
+
 
 #pragma mark Game Over Man
 
