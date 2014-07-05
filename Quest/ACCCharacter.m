@@ -82,7 +82,7 @@
     _charSpeed = 0;
     
     
-    //TEXTURE ....
+    //TEXTURE ..../test github
     
     fps  = [[characterData objectForKey:@"FPS"]  unsignedCharValue];
     
