@@ -82,7 +82,7 @@
     _charSpeed = 0;
     
     
-    //TEXTURE ..../test github/test on mbp / at conmcast
+    //TEXTURE ..../test github/test on mbp / at conmcast at goshen wifi
     
     fps  = [[characterData objectForKey:@"FPS"]  unsignedCharValue];
     
